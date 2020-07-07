@@ -1,0 +1,145 @@
+import turtle                                               #importing module->turtle for graphical stuffs
+import winsound                                        #for the sounds in the game
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#SETTING THE GAME ENVIRONMENT
+wn = turtle.Screen()                                   #creating a window for graphical o/ps
+wn.title('Pong by AdMi')                    #assigning the name to our game
+wn.bgcolor('white')                            #background color of the display window as black
+wn.setup(width = 800 , height = 600)    #specifying the dimensions of our display window to be 800*600 pixels
+wn.tracer(0)                                          #research..!
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#DEFINING THE ELEMENTS 
+#paddle A
+pad_a=turtle.Turtle()                                  #defining pad_a as a turtle.......turtle-->module  whereas Turtle()-->inbuilt class for defining a turtle
+pad_a.speed(0)                                      #not the speed with which paddle moves on the screen..it's the speed of automation-->sets speed to max possible
+pad_a.shape('square')                              #shaping our paddle with inbuilt square shape
+pad_a.shapesize(stretch_wid=5, stretch_len=1)  #by default the paddle is of 20*20...here we stretch the width of it by 5 times ie. it becomes 100 pixels
+pad_a.color('red')                                  #making our paddle color to be white
+pad_a.penup()                                   #by default turtle makes line wherever it moves.. so to prevent it we use penup()
+pad_a.goto(-350, 0)                           #the starting point of our paddle a on the screen....(0,0)  lies in the middle of the screen
+
+#paddle B
+pad_b=turtle.Turtle()                             
+pad_b.speed(0)                                 
+pad_b.shape('square')                          
+pad_b.shapesize(stretch_wid=5, stretch_len=1) 
+pad_b.color('red')                                
+pad_b.penup()     
+pad_b.goto(350, 0) 
+
+# Ball
+ball=turtle.Turtle()                             
+ball.speed(0)                                 
+ball.shape('circle')               #defining the shape of the ball to be circle                          
+ball.color('red')                                
+ball.penup()     
+ball.goto(0, 0)                     #(0,0) as we want our ball to be initially at the centre of the screen 
+ball.dx = 0.4            #change in x to be 1 pixels
+ball.dy =-0.4            #change in y to be 1 pixels
+#what this means is that on every movement of the ball its x & y coordinates changes by 2 pixels
+
+#Pen--for scores of the players
+pen = turtle.Turtle()
+pen.speed(0)
+pen.color('black')
+pen.penup()                    #so that we dont see lines on movement of the turtle
+pen.hideturtle( )               #hides the turtle as we dont want the pen to be seen on the display
+pen.goto(0,260)             #getting the turtle on the top for display
+pen.write('Player A: 0    Player B: 0', align='center', font=('Courier', 18 ,'normal'))   #write()  used to write on the display
+#24 here is font size
+
+#score
+score_a =0
+score_b =0
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#DEFINING THE MOVEMENT OF THE ELEMENTS
+#functions for movements of paddle A
+def pad_a_up():                     #defining the function for the up movement of the paddle A
+    y = pad_a.ycor()                #we get the current y coordinate of A using .ycor() & assign it to y
+    y+=20                              #increasing the y coordinate by 20 wrt it's current position
+    pad_a.sety(y)                     #we actually assign the new value of y to the paddle ie y+20
+    
+def pad_a_down():                     #defining the function for the down movement of the paddle A
+    y = pad_a.ycor()                #we get the y current coordinate of A using .ycor() & assign it to y
+    y-=20                              #decreasing the y coordinate by 20 wrt it's current position
+    pad_a.sety(y)                     #we actually assign the new value of y to the paddle ie y+20
+    
+        
+#functions for movement of paddle B    
+def pad_b_up():                     #defining the function for the up movement of the paddle B
+    y = pad_b.ycor()              
+    y+=20                              
+    pad_b.sety(y)                    
+    
+def pad_b_down():       #defining the function for the down movement of the paddle b
+    y = pad_b.ycor()               
+    y=y - 20                             
+    pad_b.sety(y)                   
+    
+    
+    
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#READING THE INSTRUCTS FROM THE KEYBOARD
+#To read the keyboard instructs  ie Keyboard Binding---->binding the keyboard to our prog
+wn.listen()                           #wn is our display window & we instruct it to listen to any command from the keyboard using    .listen()
+
+#for paddle A
+wn.onkeypress(pad_a_up, 'w')  #we tell the computer that when it senses the key w pressed, call the pad_a_up() function
+wn.onkeypress(pad_a_down, 's')
+
+#for paddle B
+wn.onkeypress(pad_b_up, 'Up')  #we tell the computer that when it senses the up arrow key pressed, call the pad_b_up() function
+wn.onkeypress(pad_b_down, 'Down')
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#THE MAIN GAME LOOP
+while True:
+    wn.update()                                     #keep updating the display window until condition evaluates to true
+    
+    #ball movement
+    ball.setx(ball.xcor() + ball.dx)          #get the x coord. of ball..add ball.dx to it<defined earlier>...then set the x coord. of the ball to current+ball.dx
+    ball.sety(ball.ycor() + ball.dy)          #get the y coord. of ball..add ball.dy to it<defined earlier>...then set the y coord. of the ball to current+ball.dy
+    
+    #BORDER CHECKING
+    #The vertical borders--
+    if ball.ycor() > 290:                  #we have border at 300.....height of ball is 20 pixels..so this loop evaluates when the centre of the ball is at 290 
+                                                     #ie. the upper edge of the ball hits the border
+        ball.sety(290)                        #set the y coord. of the ball to be 290
+        ball.dy*=-1                          #set the change in the y coord. to be -ve ie. after hitting the ball starts to move downwards
+        winsound.PlaySound('invalid_keypress.mp3', winsound.SND_ASYNC)
+ #for playing the sound..SND_ASYNC shows that sound should be played in asynchronous way ie. the main loop shouldnt stop while sound gets executed & sound should be played in the background
+            
+    if ball.ycor() <-290:                                                                
+        ball.sety(-290)                        
+        ball.dy*=-1   
+        winsound.PlaySound('invalid_keypress.mp3', winsound.SND_ASYNC)
+        
+    #side borders
+    if ball.xcor() > 390:
+        ball.goto(0,0)
+        ball.dx*=-1
+        score_a+=1
+        pen.clear()    #so that the scores dont overlap and we get clean display everytime the score updates
+        pen.write('Player A: {}    Player B: {}'.format(score_a, score_b), align='center', font=('Courier', 18 ,'normal')) #used for updating the scores
+      
+    if ball.xcor() <- 390:
+        ball.goto(0,0)
+        ball.dx*=-1
+        score_b+=1
+        pen.clear()
+        pen.write('Player A: {}    Player B: {}'.format(score_a, score_b), align='center', font=('Courier', 18 ,'normal'))
+        
+    
+    #collisions
+    if (ball.xcor() > 340 and ball.xcor() < 350)  and  (ball.ycor()<pad_b.ycor() + 50  and  ball.ycor()>pad_b.ycor() - 50):
+        ball.setx(340)
+        ball.dx*=-1
+        winsound.PlaySound('invalid_keypress.mp3', winsound.SND_ASYNC)
+        
+    if (ball.xcor() <- 340 and ball.xcor() > -350) and ( ball.ycor()<pad_a.ycor() + 50  and  ball.ycor()>pad_a.ycor() - 50):
+        ball.setx(-340)
+        ball.dx*=-1
+        winsound.PlaySound('invalid_keypress.mp3', winsound.SND_ASYNC)
